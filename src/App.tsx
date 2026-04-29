@@ -534,8 +534,7 @@ export default function App() {
       <img 
         id="couple-bg-img"
         src="https://drive.google.com/uc?export=view&id=11dGQ0qZqMLGFmgYB4ahp2tI3A3puZneI"
-        alt=""
-        crossOrigin="anonymous"
+        alt="couple.png"
         onLoad={() => {
           // Additional safety if needed
         }}
@@ -562,10 +561,10 @@ export default function App() {
            animate={{ opacity: 1, y: 0 }}
            className="text-center mb-8"
         >
-          <span className="font-marathi-display text-[var(--text-secondary)] text-xl tracking-[0.2em] block mb-4 shimmer-text">
+          <span className="font-marathi-display text-[var(--text-secondary)] text-xl tracking-[0.01em] block mb-4 shimmer-text">
             || श्री गणेशाय नम: ||
           </span>
-          <div className="inline-block px-6 py-2 border border-[rgba(201,168,76,0.4)] rounded-full text-sm tracking-[0.25em] text-[var(--text-primary)] font-bold uppercase bg-[rgba(201,168,76,0.15)] glass">
+          <div className="inline-block px-6 py-2 border border-[rgba(201,168,76,0.4)] rounded-full text-sm tracking-[0.01em] text-[var(--text-primary)] font-bold uppercase bg-[rgba(201,168,76,0.15)] glass">
             पाटील परिवार
           </div>
         </motion.div>
