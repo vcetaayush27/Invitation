@@ -820,7 +820,7 @@ export default function App() {
                 <X className="w-5 h-5" />
               </button>
               <img
-                src="https://github.com/vcetaayush27/Invitation/blob/868af923dee11ff89b8f77f3f76ecfa2145a2c1b/invite.png"
+                src="https://raw.githubusercontent.com/vcetaayush27/Invitation/81fa4468d8be190181fb1b8e80c982cf4aab6826/invite.png"
                 alt="Invitation"
                 className="w-full h-auto rounded-2xl shadow-2xl border-2 border-gold/20"
               />
