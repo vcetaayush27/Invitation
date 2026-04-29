@@ -89,6 +89,29 @@ body.dark-mode h1 {
   }
 }
 
+#couple-bg-img {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  mix-blend-mode: luminosity;
+  filter: sepia(0.3) saturate(0.6) brightness(0.45);
+  transition: opacity 1.2s ease;
+  will-change: opacity;
+}
+
+/* Ensure content is above the background watermark */
+#root > div {
+  position: relative;
+  z-index: 10;
+}
+
 @media (hover: hover) and (pointer: fine) {
   body { cursor: none; }
   a, button, .interactive { cursor: none; }

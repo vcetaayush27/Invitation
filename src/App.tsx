@@ -469,64 +469,54 @@ export default function App() {
     return () => window.removeEventListener('touchstart', onTouchStart);
   }, []);
 
-  // Couple Photo Observer and Parallax
+  // Couple Background Image Scroll & Theme Logic
   useEffect(() => {
-    const section = document.getElementById('names-section');
-    const photo = document.getElementById('couple-photo') as HTMLImageElement;
-    if (!section || !photo) return;
-
-    let fadeTimer: ReturnType<typeof setTimeout>;
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          // Phase 1: Gentle fade in
-          photo.style.opacity = '0.28';
-          photo.style.filter = theme === 'dark' 
-            ? 'brightness(0.7) contrast(1.2) saturate(0.8) blur(2px)' 
-            : 'brightness(1.1) contrast(0.9) saturate(0.7) sepia(0.2) blur(2px)';
-          
-          // Phase 2: Sharpen and set final opacity
-          fadeTimer = setTimeout(() => {
-            photo.style.opacity = theme === 'dark' ? '0.35' : '0.22';
-            photo.style.filter = theme === 'dark'
-              ? 'brightness(0.9) contrast(1.1) saturate(0.85) sepia(0.1) blur(0px)'
-              : 'brightness(1.05) contrast(0.95) saturate(0.75) sepia(0.15) blur(0px)';
-            
-            // Mobile adjustments check
-            if (window.innerWidth <= 600) {
-              photo.style.opacity = '0.40';
-            }
-          }, 600);
-        } else {
-          photo.style.opacity = '0';
-          photo.style.filter = photo.style.filter + ' blur(5px)';
-          clearTimeout(fadeTimer);
-        }
-      });
-    }, { threshold: 0.25 });
-
-    observer.observe(section);
+    const coupleImg = document.getElementById('couple-bg-img') as HTMLImageElement;
+    if (!coupleImg) return;
 
     const handleScroll = () => {
-      if (window.innerWidth > 600) {
-        const rect = section.getBoundingClientRect();
-        const winH = window.innerHeight;
-        if (rect.top < winH && rect.bottom > 0) {
-          const scrollDistance = winH - rect.top;
-          const parallaxValue = Math.min(scrollDistance * 0.3, 40);
-          photo.style.transform = `translateX(-50%) translateY(-${parallaxValue}px)`;
-        }
+      const scrollY = window.scrollY;
+      const docHeight = document.body.scrollHeight - window.innerHeight;
+      const progress = scrollY / docHeight;
+      const isLight = document.body.classList.contains('light-mode');
+      
+      const maxOpacity = isLight ? 0.18 : 0.28;
+      let targetOpacity = 0;
+
+      if (progress < 0.08) {
+        targetOpacity = 0;
+      } else if (progress < 0.25) {
+        targetOpacity = ((progress - 0.08) / 0.17) * maxOpacity;
+      } else if (progress < 0.75) {
+        targetOpacity = maxOpacity;
+      } else if (progress < 0.92) {
+        targetOpacity = maxOpacity * (1 - ((progress - 0.75) / 0.17));
+      } else {
+        targetOpacity = 0;
+      }
+
+      coupleImg.style.opacity = targetOpacity.toString();
+    };
+
+    const updateFilter = () => {
+      const isDark = document.body.classList.contains('dark-mode');
+      if (isDark) {
+        coupleImg.style.filter = 'sepia(0.3) saturate(0.6) brightness(0.45)';
+        coupleImg.style.mixBlendMode = 'luminosity';
+      } else {
+        coupleImg.style.filter = 'sepia(0.2) saturate(0.5) brightness(0.75)';
+        coupleImg.style.mixBlendMode = 'multiply';
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
-
-    return () => {
-      observer.disconnect();
-      window.removeEventListener('scroll', handleScroll);
-      clearTimeout(fadeTimer);
-    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    updateFilter(); // Initial state
+    
+    // Watch for theme changes via a simple polling or event if possible, 
+    // but we can also just rely on toggleTheme calling a function.
+    // For now, let's just run it whenever theme state changes by adding theme to dependency.
+    
+    return () => window.removeEventListener('scroll', handleScroll);
   }, [theme]);
 
   const toggleTheme = () => {
@@ -535,24 +525,24 @@ export default function App() {
     localStorage.setItem('theme', newTheme);
     document.body.classList.add(newTheme === 'dark' ? 'dark-mode' : 'light-mode');
     document.body.classList.remove(newTheme === 'dark' ? 'light-mode' : 'dark-mode');
-
-    // Update couple photo blend mode and filter
-    const photo = document.getElementById('couple-photo');
-    if (photo) {
-      if (newTheme === 'dark') {
-        photo.style.mixBlendMode = 'screen';
-        photo.style.filter = 'brightness(0.9) contrast(1.1) saturate(0.85) sepia(0.1)';
-      } else {
-        photo.style.mixBlendMode = 'multiply';
-        photo.style.filter = 'brightness(1.05) contrast(0.95) saturate(0.75) sepia(0.15)';
-      }
-    }
   };
 
   const nameStyles = "text-[clamp(2.8rem,7vw,5rem)] font-sans font-bold name-gradient relative inline-block animate-[floatName_2.5s_ease-in-out_infinite_alternate] transition-transform duration-400 hover:scale-[1.08] cursor-none interactive";
 
   return (
     <div className="min-h-screen relative overflow-x-hidden">
+      <img 
+        id="couple-bg-img"
+        src="https://drive.google.com/uc?export=view&id=11dGQ0qZqMLGFmgYB4ahp2tI3A3puZneI"
+        alt=""
+        crossOrigin="anonymous"
+        onLoad={() => {
+          // Additional safety if needed
+        }}
+        onError={(e) => {
+          (e.target as HTMLImageElement).style.display = 'none';
+        }}
+      />
       <BackgroundLayers theme={theme} />
       <CustomCursor />
       <ScrollProgress />
@@ -606,16 +596,6 @@ export default function App() {
 
       {/* Names Section */}
       <Section id="names-section" className="py-32 md:py-48 relative overflow-hidden">
-        <img 
-          id="couple-photo"
-          src="https://artifact.ais.google.com/ais-dev-ohesbqh76mldz5iopgmjhz-218059758566.asia-southeast1.run.app/couple.png" 
-          alt="Pratima & Hemant"
-          onError={(e) => {
-            // Fallback if the artifact path is wrong or missing
-            (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=1000&auto=format&fit=crop';
-            (e.target as HTMLImageElement).style.opacity = '0.1';
-          }}
-        />
         <div className="flex flex-col md:flex-row items-center justify-center gap-12 md:gap-20 relative z-[2]">
           <div className="relative">
             <span className={nameStyles}>
