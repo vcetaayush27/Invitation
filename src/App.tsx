@@ -533,7 +533,7 @@ export default function App() {
     <div className="min-h-screen relative overflow-x-hidden">
       <img 
         id="couple-bg-img"
-        src="https://drive.google.com/uc?export=view&id=11dGQ0qZqMLGFmgYB4ahp2tI3A3puZneI"
+        src="couple.png"
         alt="couple.png"
         onLoad={() => {
           // Additional safety if needed
